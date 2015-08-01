@@ -4,7 +4,14 @@
 # =============== #
 Temp/
 Library/
-
+# =====================================#
+#LeapMotionCoreAsset_2_3_1.unitypackage#
+Assets/Gizmos/
+Assets/LeapMotion/
+Assets/LeapMotion+OVR/
+Assets/OVR/
+Assets/Plugins
+# ======================================#
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
 # ===================================== #
