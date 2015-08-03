@@ -5,7 +5,8 @@ using Leap;
 public class tracking : MonoBehaviour {
 	
 	Controller controller;
-	public float sensitivity = 1.5f; // Adjusts speed of LeapMotion tracking.
+	public float sensitivity = 1000.0f; // Adjusts speed of LeapMotion tracking.
+	public int cursorSize = 25;
 	
 	// Use this for initialization
 	void Start () {
@@ -23,25 +24,45 @@ public class tracking : MonoBehaviour {
 	}
 
 	void trackMouse()
-	{
+	{	
 		// Cursor follow mouse.
-		Vector3 mousePosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-		GetComponent<Rigidbody2D> ().position = Vector2.Lerp(transform.position, mousePosition, 1);
-		print (transform.position);
-		print (Input.mousePosition);
+		// Don't let cursor go outside screen.
+		Vector2 v = Input.mousePosition;
+		v.x = Mathf.Clamp (Input.mousePosition.x, cursorSize, UnityEngine.Screen.width - cursorSize);
+		v.y = Mathf.Clamp (Input.mousePosition.y, cursorSize, UnityEngine.Screen.height - cursorSize);
+
+		// Transform screen point to world point.
+		Vector3 mousePosition = Camera.main.ScreenToWorldPoint (v);
+		GetComponent<Rigidbody2D> ().position = new Vector2(mousePosition.x, mousePosition.y);
 	}
 
 	void trackHand()
-	{
+	{	
 		// Cursor follow LeapMotion hand position.
 		Frame frame = controller.Frame ();
 		Hand hand = frame.Hands [0];
-		Vector3 v = hand.StabilizedPalmPosition.ToUnityScaled ();
-		
-		v.Scale (new Vector3(sensitivity, sensitivity, 0.0f));
-		Vector3 z = new Vector3(v.x * 4.0f, v.y * 2.5f, 0.0f);
-		z.y = z.y - 12.0f;
-		GetComponent<Rigidbody2D> ().position = Vector2.Lerp(transform.position, z, 1);
+		Vector3 v = hand.StabilizedPalmPosition.ToUnity();
+
+		// LeapMotion tracking range in mm
+		// y 100mm - 250mm
+		// x (-)160mm - 160mm
+		// z ignored.
+
+		// Limit interaction range (Minimizes RSI).
+		v.x = Mathf.Clamp (v.x, -120, 120);
+		v.y = Mathf.Clamp (v.y, 100, 250);
+
+		// Transform LeapMotion mm into Unity world point.
+		v.x = ((v.x + 120) / 240) * UnityEngine.Screen.width;
+		v.y = ((v.y - 100) / 150) * UnityEngine.Screen.height;
+
+		// Limit cursor draw range i.e. Keep cursor inside window.
+		v.x = Mathf.Clamp (v.x, cursorSize, UnityEngine.Screen.width - cursorSize);
+		v.y = Mathf.Clamp (v.y, cursorSize, UnityEngine.Screen.height - cursorSize);
+
+		Vector3 z = Camera.main.ScreenToWorldPoint (v);
+
+		GetComponent<Rigidbody2D> ().position = new Vector2 (z.x, z.y);
 	}
 
 }
