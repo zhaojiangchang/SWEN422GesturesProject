@@ -3,9 +3,8 @@ using System.Collections;
 using Leap;
 
 public class tracking : MonoBehaviour {
-	
-	Controller controller;
-	public float sensitivity = 1000.0f; // Adjusts speed of LeapMotion tracking.
+
+	public Controller controller;
 	public int cursorSize = 25;
 	
 	// Use this for initialization
@@ -21,6 +20,10 @@ public class tracking : MonoBehaviour {
 		else
 			trackMouse();
 
+	}
+
+	void OnTriggerEnter(Collider other) {
+		print ("collision");
 	}
 
 	void trackMouse()
@@ -64,5 +67,7 @@ public class tracking : MonoBehaviour {
 
 		GetComponent<Rigidbody2D> ().position = new Vector2 (z.x, z.y);
 	}
+
+
 
 }
