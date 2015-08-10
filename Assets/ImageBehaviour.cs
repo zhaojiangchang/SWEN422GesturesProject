@@ -24,6 +24,14 @@ public class ImageBehaviour : MonoBehaviour {
 		controller.Config.SetFloat ("Gesture.KeyTap.MinDownVelocity", 20.0f);
 		controller.Config.SetFloat ("Gesture.KeyTap.HistorySeconds", 0.2f);
 		controller.Config.SetFloat ("Gesture.KeyTap.MinDistance", 4.0f);
+
+
+		// For circle gesture
+		controller.EnableGesture(Leap.Gesture.GestureType.TYPECIRCLE);
+		controller.Config.SetFloat("Gesture.Circle.MinRadius", 10.0f);
+		controller.Config.SetFloat("Gesture.Circle.MinArc", 1.0f);
+
+
 		controller.Config.Save();
 	}
 
@@ -81,6 +89,21 @@ public class ImageBehaviour : MonoBehaviour {
 		{
 			print ("Screen tap");
 			images.Clear ();
+		}
+		else if(frame.Gestures () [0].Type  == Gesture.GestureType.TYPECIRCLE) {
+			CircleGesture circle = new CircleGesture(frame.Gestures () [0]);
+			Vector centerPoint = circle.Center;
+			Pointable circlePointable = circle.Pointable;
+			
+			if (circle.Pointable.Direction.AngleTo(circle.Normal) <= 3.1415/2) {
+				print("CLOCKWISE CIRCLE");
+				image.transform.Rotate(Vector3.back, 45 * Time.deltaTime);
+			}
+			else
+			{
+				print("COUNTERCLOCKWISE CIRCLE");
+				image.transform.Rotate(Vector3.forward, 45 * Time.deltaTime);
+			}
 		}
 
 		if(images.Contains(image))
