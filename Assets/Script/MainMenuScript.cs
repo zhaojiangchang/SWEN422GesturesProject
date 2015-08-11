@@ -79,15 +79,7 @@ public class MainMenuScript : MonoBehaviour {
 
 	void trackMouse()
 	{	
-		// Cursor follow mouse.
-		// Don't let cursor go outside screen.
-		Vector2 v = Input.mousePosition;
-		v.x = Mathf.Clamp (Input.mousePosition.x, cursorSize, UnityEngine.Screen.width - cursorSize);
-		v.y = Mathf.Clamp (Input.mousePosition.y, cursorSize, UnityEngine.Screen.height - cursorSize);
-		
-		// Transform screen point to world point.
-		Vector3 mousePosition = Camera.main.ScreenToWorldPoint (v);
-		GetComponent<Rigidbody2D> ().position = new Vector2(mousePosition.x, mousePosition.y);
+
 	}
 	
 	void trackHand()
