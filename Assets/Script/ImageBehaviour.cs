@@ -8,11 +8,12 @@ using System.Linq;
 public class ImageBehaviour : MonoBehaviour {
 
 	Controller controller;
-	private static List<Rigidbody2D> images = new List<Rigidbody2D>();
+	public static List<Rigidbody2D> images = new List<Rigidbody2D>();
 	Rigidbody2D image;
 	float panelWidth = 780;
 
 	// Use this for initialization
+
 	void Start () {
 		controller = new Controller ();
 		image = this.GetComponent<Rigidbody2D> ();

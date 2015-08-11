@@ -6,6 +6,7 @@ using Leap;
 public class UIScript : MonoBehaviour {
 	
 	public Canvas quitMenu;
+	public Canvas trashMenu;
 	public Button mainMenuText;
 	public Button trashText;
 	public Controller controller;
@@ -14,6 +15,8 @@ public class UIScript : MonoBehaviour {
 	void Start () 
 	{
 		quitMenu = quitMenu.GetComponent<Canvas> ();
+		trashMenu = trashMenu.GetComponent<Canvas> ();
+
 		mainMenuText = mainMenuText.GetComponent<Button> ();
 		trashText = trashText.GetComponent<Button> ();
 
@@ -27,6 +30,7 @@ public class UIScript : MonoBehaviour {
 		controller.Config.Save();
 		
 		quitMenu.enabled = false;
+		trashMenu.enabled = false;
 	}
 	
 	void OnTriggerStay2D(Collider2D other) 
@@ -36,14 +40,53 @@ public class UIScript : MonoBehaviour {
 		
 		if (frame.Gestures () [0].Type == Gesture.GestureType.TYPEKEYTAP) 
 		{
-			print ("Screen tap");
+			
+			if(this.gameObject.name.Equals("Main Menu"))
+			{
+				print ("Main Menu - Key tap");
+				mainMenuPress();
+			}
+			if(this.gameObject.name.Equals("Trash"))
+			{
+				print ("Trash - Key tap");
+				trashPress();
+			}
+			if(this.gameObject.name.Equals("Yes"))
+			{
+				print ("Yes - Key tap");
+				mainMenuLevel();
+			}
+			if(this.gameObject.name.Equals("No"))
+			{
+				print ("No - Key tap");
+				NoPress();
+			}
+			if(this.gameObject.name.Equals("Confirm"))
+			{
+				print ("Confirm - Key tap");
+				ConfirmPress();
+			}
+			if(this.gameObject.name.Equals("Reject"))
+			{
+				print ("Reject - Key tap");
+				RejectPress();
+			}
 		}
 		
 	}
-
+	
 	public void mainMenuPress()
 	{
+		print ("mainmenu pressed");
 		quitMenu.enabled = true;
+		mainMenuText.enabled = false;
+		trashText.enabled = false;
+	}
+
+	public void trashPress()
+	{
+		print ("trash pressed");
+		trashMenu.enabled = true;
 		mainMenuText.enabled = false;
 		trashText.enabled = false;
 	}
@@ -60,6 +103,21 @@ public class UIScript : MonoBehaviour {
 		Application.LoadLevel (0);
 	}
 
+	public void ConfirmPress()
+	{
+		print ("confirm pressed"+ ImageBehaviour.images.Count);
+		ImageBehaviour.images.Clear ();
+		trashMenu.enabled = false;
+		mainMenuText.enabled = true;
+		trashText.enabled = true;	
+	}
+	public void RejectPress()
+	{
+		print ("reject pressed");
+		trashMenu.enabled = false;
+		mainMenuText.enabled = true;
+		trashText.enabled = true;
+	}
 	// Update is called once per frame
 	void Update () {
 		if (controller.IsConnected)

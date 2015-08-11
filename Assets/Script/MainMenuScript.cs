@@ -16,7 +16,6 @@ public class MainMenuScript : MonoBehaviour {
 		quitMenu = quitMenu.GetComponent<Canvas> ();
 		startText = startText.GetComponent<Button> ();
 		exitText = exitText.GetComponent<Button> ();
-
 		controller = new Controller();
 		controller.EnableGesture (Gesture.GestureType.TYPEKEYTAP);
 
@@ -36,10 +35,28 @@ public class MainMenuScript : MonoBehaviour {
 		
 		if (frame.Gestures () [0].Type == Gesture.GestureType.TYPEKEYTAP) 
 		{
-			print ("Screen tap");
+
+			if(this.gameObject.name.Equals("Play"))
+			{
+				print ("Play - Key tap");
+				StartLevel();
+			}
+			if(this.gameObject.name.Equals("Exit"))
+			{
+				print ("Exit - Key tap");
+				ExitPress();
+			}
+			if(this.gameObject.name.Equals("Yes"))
+			{
+				print ("Yes - Key tap");
+				ExitGame();
+			}
+			if(this.gameObject.name.Equals("No"))
+			{
+				print ("No - Key tap");
+				NoPress();
+			}
 		}
-		
-		// If nothing is selected and curosr is hovering over an image.
 	}
 
 	public void ExitPress()
@@ -69,8 +86,6 @@ public class MainMenuScript : MonoBehaviour {
 	void Update () {
 		if (controller.IsConnected)
 			trackHand();
-		else
-			trackMouse();
 	}
 
 	void OnTriggerEnter(Collider other) {
