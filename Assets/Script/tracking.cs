@@ -17,7 +17,7 @@ public class tracking : MonoBehaviour {
 
 		if (controller.IsConnected) {
 			trackHand (0);
-			trackHand (1);
+			//trackHand (1);
 		}
 		else
 			trackMouse();
@@ -53,13 +53,25 @@ public class tracking : MonoBehaviour {
 		// x (-)160mm - 160mm
 		// z ignored.
 
-		// Limit interaction range (Minimizes RSI).
-		v.x = Mathf.Clamp (v.x, -120, 120);
-		v.y = Mathf.Clamp (v.y, 100, 250);
+		if (handIndex == 0) {
+			// Limit interaction range (Minimizes RSI).
+			v.x = Mathf.Clamp (v.x, 0, 120);
+			v.y = Mathf.Clamp (v.y, 100, 250);
 
-		// Transform LeapMotion mm into Unity world point.
-		v.x = ((v.x + 120) / 240) * UnityEngine.Screen.width;
-		v.y = ((v.y - 100) / 150) * UnityEngine.Screen.height;
+			// Transform LeapMotion mm into Unity world point.
+			v.x = (v.x / 120) * UnityEngine.Screen.width;
+			v.y = ((v.y - 100) / 150) * UnityEngine.Screen.height;
+		} 
+		else 
+		{
+			// Limit interaction range (Minimizes RSI).
+			v.x = Mathf.Clamp (v.x, 0, 120);
+			v.y = Mathf.Clamp (v.y, 100, 250);
+			
+			// Transform LeapMotion mm into Unity world point.
+			v.x = ((v.x) / 120) * UnityEngine.Screen.width;
+			v.y = ((v.y - 100) / 150) * UnityEngine.Screen.height;
+		}
 
 		// Limit cursor draw range i.e. Keep cursor inside window.
 		v.x = Mathf.Clamp (v.x, cursorSize, UnityEngine.Screen.width - cursorSize);

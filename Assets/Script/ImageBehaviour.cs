@@ -10,7 +10,7 @@ public class ImageBehaviour : MonoBehaviour {
 	private static Controller controller;
 	public static List<Rigidbody2D> images = new List<Rigidbody2D>();
 	Rigidbody2D image;
-	float panelWidth = UnityEngine.Screen.width - 300;
+	private static float panelWidth;// = UnityEngine.Screen.width - 300;
 	private Vector3 intialPosition;
 	private static GameObject cursor;
 	
@@ -23,6 +23,7 @@ public class ImageBehaviour : MonoBehaviour {
 
 		if (intialized)
 			return;
+		panelWidth = ((float) UnityEngine.Screen.width) - GameObject.Find ("Sidebar").GetComponent<RectTransform> ().rect.width;
 		cursor = GameObject.Find ("glowing_ring");
 		controller = new Controller ();
 
@@ -67,12 +68,16 @@ public class ImageBehaviour : MonoBehaviour {
 
 	void OnTriggerStay2D(Collider2D other) 
 	{	
+		// Images can collide. Only bother with this if its the cursor.
+		if (!other.gameObject.name.Equals ("glowing_ring"))
+			return;
+
 		Frame frame = controller.Frame ();
-		Hand hand = frame.Hands [0];
-		Hand otherHand = frame.Hands [1];
+		Hand hand = frame.Hands[0];
+		Hand otherHand = frame.Hands[1];
 		Gesture gesture = frame.Gestures () [0];
 
-		if (!images.Contains (image) && hand.PinchStrength + otherHand.PinchStrength > 0.7f && timer.ElapsedMilliseconds > 700) {
+		if (!images.Contains (image) && hand.PinchStrength > 0.7f && otherHand.PinchStrength > 0.7f) {
 			print ("Selected: " + this.gameObject.name);
 			print ("Added: " + this.gameObject.name);
 			images.Add (image);
@@ -97,22 +102,11 @@ public class ImageBehaviour : MonoBehaviour {
 				image.transform.Rotate (Vector3.forward, 45 * Time.deltaTime);
 			}
 		}
-		// Order images.
-		else if (images.Contains(image) && hand.PinchStrength > 0.7f) 
-		{
-			Vector3 v = otherHand.Direction.ToUnity();
-			print("Other hand: " + v);
-
-			if(v.x > 0.0f)
-			{
-			}
-			
-			int depth = this.gameObject.GetComponent<SpriteRenderer>().sortingOrder;
-			this.gameObject.GetComponent<SpriteRenderer>().sortingOrder = depth;
-		}
 
 		// If nothing is selected and cursor is hovering over an image start Zoom.
-		if (images.Count == 0 && timer.ElapsedMilliseconds > 1500) {
+		if (timer == null)
+			return;
+		if (images.Count == 0 && timer.ElapsedMilliseconds > 2000 && frame.Hands.Count == 1) {
 
 			float z = hand.Fingers [0].TipPosition.z > enterZ ? 0.5f : -0.5f;
 			
@@ -125,13 +119,26 @@ public class ImageBehaviour : MonoBehaviour {
 	}
 
 	// Update is called once per frame
+	Frame previous;
 	void Update () {
 
 		Frame frame = controller.Frame ();
+		previous = previous == null ? frame : previous;
+		Hand otherHand = frame.Hands [0];
+		
 		if (frame.Gestures () [0].Type == Gesture.GestureType.TYPEKEYTAP) 
 		{
 			this.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
 			images.Clear ();
+		}
+
+		if(images.Contains(image) && frame.Hands.Count > 1)
+		{
+			float z = frame.Hands.Leftmost.PalmPosition.z;
+			z = Mathf.Clamp(z, 0.0f, 120.0f);
+			int depth = (int) Mathf.Floor((z / 120.0f) * 5.0f);
+			this.gameObject.GetComponent<SpriteRenderer> ().sortingOrder = depth;
+			print (depth);
 		}
 
 		if (this.image.position.x < -1100.0f && this.image.position.x > -2700.0f 
@@ -141,19 +148,22 @@ public class ImageBehaviour : MonoBehaviour {
 			rot = new Vector3(0,0,0);
 			image.position = intialPosition;
 			image.transform.localRotation = Quaternion.Euler (rot);
+			image.transform.localScale = new Vector3(50.0f, 50.0f, 0.0f);
 			this.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
 			images.Remove (image);
 		}
 
 		if(images.Contains(image) && frame.Hands[0].PinchStrength > 0.7f)
 			trackLeap (frame);
+
+		previous = frame;
 	}
 
 	void trackLeap(Frame frame)
 	{	
 		int sep = images.IndexOf (image);
 		float xOffset = transform.localScale.x * 1.4f;
-		float yOffset = transform.localScale.y + 4.0f;
+		float yOffset = transform.localScale.y;
 		// Cursor follow LeapMotion hand position.
 		Hand hand = frame.Hands [0];
 		Vector3 v = hand.StabilizedPalmPosition.ToUnity();
@@ -164,11 +174,19 @@ public class ImageBehaviour : MonoBehaviour {
 		// z ignored.
 		
 		// Limit interaction range (Minimizes RSI).
-		v.x = Mathf.Clamp (v.x, -120, 120);
+		//v.x = Mathf.Clamp (v.x, -120, 120);
+		//v.y = Mathf.Clamp (v.y, 100, 250);
+		
+		// Transform LeapMotion mm into Unity world point.
+		//v.x = ((v.x + 120) / 240) * UnityEngine.Screen.width;
+		//v.y = ((v.y - 100) / 150) * UnityEngine.Screen.height;
+
+		// Limit interaction range (Minimizes RSI).
+		v.x = Mathf.Clamp (v.x, 0, 120);
 		v.y = Mathf.Clamp (v.y, 100, 250);
 		
 		// Transform LeapMotion mm into Unity world point.
-		v.x = ((v.x + 120) / 240) * UnityEngine.Screen.width;
+		v.x = (v.x / 120) * UnityEngine.Screen.width;
 		v.y = ((v.y - 100) / 150) * UnityEngine.Screen.height;
 		
 		// Limit cursor draw range i.e. Keep cursor inside window.
