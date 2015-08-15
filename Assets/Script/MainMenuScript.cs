@@ -5,17 +5,18 @@ using Leap;
 
 public class MainMenuScript : MonoBehaviour {
 
-	public Canvas quitMenu;
-	public Button startText;
-	public Button exitText;
+	private Canvas quitMenu;
+	private Button startText;
+	private Button exitText;
 	public Controller controller;
 	public int cursorSize = 25;
+
 	// Use this for initialization
 	void Start () 
 	{
-		quitMenu = quitMenu.GetComponent<Canvas> ();
-		startText = startText.GetComponent<Button> ();
-		exitText = exitText.GetComponent<Button> ();
+		quitMenu = GameObject.Find ("QuitMenu").GetComponent<Canvas> ();
+		startText = GameObject.Find("Play").GetComponent<Button> ();
+		exitText = GameObject.Find("Exit").GetComponent<Button> ();
 		controller = new Controller();
 		controller.EnableGesture (Gesture.GestureType.TYPEKEYTAP);
 
@@ -29,13 +30,13 @@ public class MainMenuScript : MonoBehaviour {
 	}
 
 	void OnTriggerStay2D(Collider2D other) 
-	{
+	{	
+		print ("colliding");
 		Frame frame = controller.Frame ();
 		Hand hand = frame.Hands[0];
 		
 		if (frame.Gestures () [0].Type == Gesture.GestureType.TYPEKEYTAP) 
 		{
-
 			if(this.gameObject.name.Equals("Play"))
 			{
 				print ("Play - Key tap");
@@ -82,48 +83,10 @@ public class MainMenuScript : MonoBehaviour {
 	{
 		Application.Quit ();
 	}
-	// Update is called once per frame
-	void Update () {
-		if (controller.IsConnected)
-			trackHand();
-	}
 
-	void OnTriggerEnter(Collider other) {
+	void OnTriggerEnter(Collider other) 
+	{
 		print ("collision");
-	}
-
-	void trackMouse()
-	{	
-
-	}
-	
-	void trackHand()
-	{	
-		// Cursor follow LeapMotion hand position.
-		Frame frame = controller.Frame ();
-		Hand hand = frame.Hands [0];
-		Vector3 v = hand.StabilizedPalmPosition.ToUnity();
-		
-		// LeapMotion tracking range in mm
-		// y 100mm - 250mm
-		// x (-)160mm - 160mm
-		// z ignored.
-		
-		// Limit interaction range (Minimizes RSI).
-		v.x = Mathf.Clamp (v.x, -120, 120);
-		v.y = Mathf.Clamp (v.y, 100, 250);
-		
-		// Transform LeapMotion mm into Unity world point.
-		v.x = ((v.x + 120) / 240) * UnityEngine.Screen.width;
-		v.y = ((v.y - 100) / 150) * UnityEngine.Screen.height;
-		
-		// Limit cursor draw range i.e. Keep cursor inside window.
-		v.x = Mathf.Clamp (v.x, cursorSize, UnityEngine.Screen.width - cursorSize);
-		v.y = Mathf.Clamp (v.y, cursorSize, UnityEngine.Screen.height - cursorSize);
-		
-		Vector3 z = Camera.main.ScreenToWorldPoint (v);
-		
-		GetComponent<Rigidbody2D> ().position = new Vector2 (z.x, z.y);
 	}
 
 }

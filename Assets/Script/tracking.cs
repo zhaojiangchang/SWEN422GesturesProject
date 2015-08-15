@@ -15,15 +15,12 @@ public class tracking : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		if (controller.IsConnected)
-			trackHand();
+		if (controller.IsConnected) {
+			trackHand (0);
+			trackHand (1);
+		}
 		else
 			trackMouse();
-
-	}
-
-	void OnTriggerEnter(Collider other) {
-		print ("collision");
 	}
 
 	void trackMouse()
@@ -39,11 +36,16 @@ public class tracking : MonoBehaviour {
 		GetComponent<Rigidbody2D> ().position = new Vector2(mousePosition.x, mousePosition.y);
 	}
 
-	void trackHand()
+	void trackHand(int handIndex)
 	{	
 		// Cursor follow LeapMotion hand position.
 		Frame frame = controller.Frame ();
-		Hand hand = frame.Hands [0];
+		Hand hand = frame.Hands [handIndex];
+
+		// Hand doesn't exist do nothing.
+		if (hand.Direction.x == 0.0f)
+			return;
+
 		Vector3 v = hand.StabilizedPalmPosition.ToUnity();
 
 		// LeapMotion tracking range in mm
@@ -65,9 +67,11 @@ public class tracking : MonoBehaviour {
 
 		Vector3 z = Camera.main.ScreenToWorldPoint (v);
 
-		GetComponent<Rigidbody2D> ().position = new Vector2 (z.x, z.y);
+		if(handIndex == 0)
+			GameObject.Find ("glowing_ring").GetComponent<Rigidbody2D> ().position = new Vector2 (z.x, z.y);
+		if(handIndex == 1)
+			GameObject.Find ("cursor2").GetComponent<Rigidbody2D> ().position = new Vector2 (z.x, z.y);
 	}
-
 
 
 }

@@ -2,23 +2,30 @@
 using UnityEngine.UI;
 using System.Collections;
 using Leap;
+using UnityEngine;
 
 public class UIScript : MonoBehaviour {
-	
-	public Canvas quitMenu;
-	public Canvas trashMenu;
-	public Button mainMenuText;
-	public Button trashText;
-	public Controller controller;
-	public int cursorSize = 25;
+
+	private static bool initialized;
+	private static Canvas quitMenu;
+	private static Button mainMenuText;
+	private static BoxCollider2D yesButton;
+	private static BoxCollider2D noButton;
+	private static Controller controller;
+	public static int cursorSize = 25;
+
 	// Use this for initialization
 	void Start () 
 	{
-		quitMenu = quitMenu.GetComponent<Canvas> ();
-		trashMenu = trashMenu.GetComponent<Canvas> ();
+		// Only run this once.
+		if (initialized)
+			return;
 
-		mainMenuText = mainMenuText.GetComponent<Button> ();
-		trashText = trashText.GetComponent<Button> ();
+		quitMenu = GameObject.Find ("QuitMenu").GetComponent<Canvas> ();
+		mainMenuText = GameObject.Find ("Main Menu").GetComponent<Button> ();
+
+		yesButton = GameObject.Find ("Yes").GetComponent<BoxCollider2D> ();
+		noButton = GameObject.Find ("No").GetComponent<BoxCollider2D> ();
 
 		controller = new Controller();
 		controller.EnableGesture (Gesture.GestureType.TYPEKEYTAP);
@@ -30,7 +37,8 @@ public class UIScript : MonoBehaviour {
 		controller.Config.Save();
 		
 		quitMenu.enabled = false;
-		trashMenu.enabled = false;
+
+		initialized = true;
 	}
 	
 	void OnTriggerStay2D(Collider2D other) 
@@ -39,127 +47,57 @@ public class UIScript : MonoBehaviour {
 		Hand hand = frame.Hands[0];
 		
 		if (frame.Gestures () [0].Type == Gesture.GestureType.TYPEKEYTAP) 
-		{
-			
+		{	print (other == null);
+			print (this.gameObject == null);
 			if(this.gameObject.name.Equals("Main Menu"))
 			{
 				print ("Main Menu - Key tap");
+				toggleMenuButtons (true);
 				mainMenuPress();
 			}
-			if(this.gameObject.name.Equals("Trash"))
-			{
-				print ("Trash - Key tap");
-				trashPress();
-			}
-			if(this.gameObject.name.Equals("Yes"))
+			else if(this.gameObject.name.Equals("Yes") && quitMenu.enabled)
 			{
 				print ("Yes - Key tap");
 				mainMenuLevel();
 			}
-			if(this.gameObject.name.Equals("No"))
+			else if(this.gameObject.name.Equals("No") && quitMenu.enabled)
 			{
 				print ("No - Key tap");
 				NoPress();
 			}
-			if(this.gameObject.name.Equals("Confirm"))
-			{
-				print ("Confirm - Key tap");
-				ConfirmPress();
-			}
-			if(this.gameObject.name.Equals("Reject"))
-			{
-				print ("Reject - Key tap");
-				RejectPress();
-			}
 		}
-		
-	}
-	
-	public void mainMenuPress()
-	{
-		print ("mainmenu pressed");
-		quitMenu.enabled = true;
-		mainMenuText.enabled = false;
-		trashText.enabled = false;
 	}
 
-	public void trashPress()
+	/// <summary>
+	/// Toggles the menu buttons. Otherwise they will fire collision events even when not visible.
+	/// </summary>
+	/// <param name="enabled">If set to <c>true</c> enabled.</param>
+	private void toggleMenuButtons(bool enabled)
 	{
-		print ("trash pressed");
-		trashMenu.enabled = true;
-		mainMenuText.enabled = false;
-		trashText.enabled = false;
+		yesButton.enabled = enabled;
+		noButton.enabled = enabled;
 	}
-	
+
+	public void mainMenuPress()
+	{
+		quitMenu.enabled = true;
+		mainMenuText.enabled = false;
+	}
+
 	public void NoPress()
 	{
 		quitMenu.enabled = false;
 		mainMenuText.enabled = true;
-		trashText.enabled = true;
+		toggleMenuButtons (false);
 	}
 	
 	public void mainMenuLevel()
 	{
+		toggleMenuButtons (false);
 		Application.LoadLevel (0);
 	}
 
-	public void ConfirmPress()
-	{
-		print ("confirm pressed"+ ImageBehaviour.images.Count);
-		ImageBehaviour.images.Clear ();
-		trashMenu.enabled = false;
-		mainMenuText.enabled = true;
-		trashText.enabled = true;	
-	}
-	public void RejectPress()
-	{
-		print ("reject pressed");
-		trashMenu.enabled = false;
-		mainMenuText.enabled = true;
-		trashText.enabled = true;
-	}
-	// Update is called once per frame
-	void Update () {
-		if (controller.IsConnected)
-			trackHand();
-	}
-	
 	void OnTriggerEnter(Collider other) {
 		print ("collision");
 	}
-	
-	void trackMouse()
-	{	
-
-	}
-	
-	void trackHand()
-	{	
-		// Cursor follow LeapMotion hand position.
-		Frame frame = controller.Frame ();
-		Hand hand = frame.Hands [0];
-		Vector3 v = hand.StabilizedPalmPosition.ToUnity();
-		
-		// LeapMotion tracking range in mm
-		// y 100mm - 250mm
-		// x (-)160mm - 160mm
-		// z ignored.
-		
-		// Limit interaction range (Minimizes RSI).
-		v.x = Mathf.Clamp (v.x, -120, 120);
-		v.y = Mathf.Clamp (v.y, 100, 250);
-		
-		// Transform LeapMotion mm into Unity world point.
-		v.x = ((v.x + 120) / 240) * UnityEngine.Screen.width;
-		v.y = ((v.y - 100) / 150) * UnityEngine.Screen.height;
-		
-		// Limit cursor draw range i.e. Keep cursor inside window.
-		v.x = Mathf.Clamp (v.x, cursorSize, UnityEngine.Screen.width - cursorSize);
-		v.y = Mathf.Clamp (v.y, cursorSize, UnityEngine.Screen.height - cursorSize);
-		
-		Vector3 z = Camera.main.ScreenToWorldPoint (v);
-		
-		GetComponent<Rigidbody2D> ().position = new Vector2 (z.x, z.y);
-	}
-	
 }
