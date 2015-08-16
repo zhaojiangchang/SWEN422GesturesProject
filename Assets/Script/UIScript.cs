@@ -13,14 +13,17 @@ public class UIScript : MonoBehaviour {
 	private static BoxCollider2D noButton;
 	private static Controller controller;
 	public static int cursorSize = 25;
+	public static int index = 1;
 
 	// Use this for initialization
 	void Start () 
 	{
+
 		// Only run this once.
 		if (initialized)
 			return;
-
+		Random.seed = 42;
+		selectedSidebarPanel (index);
 		quitMenu = GameObject.Find ("QuitMenu").GetComponent<Canvas> ();
 		mainMenuText = GameObject.Find ("Main Menu").GetComponent<Button> ();
 
@@ -65,6 +68,11 @@ public class UIScript : MonoBehaviour {
 				print ("No - Key tap");
 				NoPress();
 			}
+			else if(this.gameObject.name.Equals("LoadImages"))
+			{
+				print ("LoadImages button - Key tap");
+				loadImagesPress();
+			}
 		}
 	}
 
@@ -96,7 +104,59 @@ public class UIScript : MonoBehaviour {
 		toggleMenuButtons (false);
 		Application.LoadLevel (0);
 	}
+	// not work - GameObject.Find will not see deactivated once set to false check the solution
+	public void loadImagesPress()
+	{
+		if (index == 4)
+			index = 0;
+		index++;
+		selectedSidebarPanel(index);
+	}
 
+	public void selectedSidebarPanel(int index)
+	{
+		print ("SidebarSet" + index);
+		print (GameObject.Find ("SidebarSet" + index)==null);
+
+		GameObject.Find ("SidebarSet" + index).SetActive(true);
+		for (int i = 1; i<5; i++) {
+			if(i!=index){
+				GameObject.Find ("SidebarSet"+i).SetActive(false);
+				
+			}
+		}
+		
+	}
+	/** solution -  i am not sure how to implement ......
+	The technical answer to your question is yes you can, but unfortunately, GameObject.Find will not see deactivated 
+	objects. If you want to be able to toggle it on and off at run time you will need to store it in a persistent variable, 
+	try making GameObject pause a class variable, and either setting it in the editor, or doing the GameObject.Find in your 
+	start function. Like this:
+		
+		GameObject pause;
+	
+	void Start()
+	{
+		pause = GameObject.Find("paused");
+	}
+	
+	void someFunc()
+	{
+		if (Input.GetKeyDown (KeyCode.Escape) || Input.GetKeyDown (KeyCode.P))
+		{
+			if (Time.timeScale > 0)
+			{
+				pause.SetActive(true);
+				
+				Time.timeScale = 0;
+			} else {
+				pause.SetActive(false);
+				
+				Time.timeScale = 1;
+			}
+		}
+	}
+	**/
 	void OnTriggerEnter(Collider other) {
 		print ("collision");
 	}
