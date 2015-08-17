@@ -4,6 +4,7 @@ using Leap;
 
 public class tracking : MonoBehaviour {
 
+	public static Vector3 handPosition;
 	public Controller controller;
 	public int cursorSize = 25;
 	
@@ -46,7 +47,7 @@ public class tracking : MonoBehaviour {
 		if (hand.Direction.x == 0.0f)
 			return;
 
-		Vector3 v = hand.StabilizedPalmPosition.ToUnity();
+		Vector3 v = hand.Fingers[0].StabilizedTipPosition.ToUnity();
 
 		// LeapMotion tracking range in mm
 		// y 100mm - 250mm
@@ -55,21 +56,21 @@ public class tracking : MonoBehaviour {
 
 		if (handIndex == 0) {
 			// Limit interaction range (Minimizes RSI).
-			v.x = Mathf.Clamp (v.x, 0, 120);
+			v.x = Mathf.Clamp (v.x, -100, 100);
 			v.y = Mathf.Clamp (v.y, 100, 250);
 
 			// Transform LeapMotion mm into Unity world point.
-			v.x = (v.x / 120) * UnityEngine.Screen.width;
+			v.x = ((v.x + 100) / 200) * UnityEngine.Screen.width;
 			v.y = ((v.y - 100) / 150) * UnityEngine.Screen.height;
 		} 
 		else 
 		{
 			// Limit interaction range (Minimizes RSI).
-			v.x = Mathf.Clamp (v.x, 0, 120);
+			v.x = Mathf.Clamp (v.x, -140, -30);
 			v.y = Mathf.Clamp (v.y, 100, 250);
 			
 			// Transform LeapMotion mm into Unity world point.
-			v.x = ((v.x) / 120) * UnityEngine.Screen.width;
+			v.x = (1 - ((v.x + 30) / -110)) * UnityEngine.Screen.width;
 			v.y = ((v.y - 100) / 150) * UnityEngine.Screen.height;
 		}
 
@@ -78,9 +79,11 @@ public class tracking : MonoBehaviour {
 		v.y = Mathf.Clamp (v.y, cursorSize, UnityEngine.Screen.height - cursorSize);
 
 		Vector3 z = Camera.main.ScreenToWorldPoint (v);
-
-		if(handIndex == 0)
+		handPosition = z;
+		
+		if (handIndex == 0) {
 			GameObject.Find ("glowing_ring").GetComponent<Rigidbody2D> ().position = new Vector2 (z.x, z.y);
+		}
 		if(handIndex == 1)
 			GameObject.Find ("cursor2").GetComponent<Rigidbody2D> ().position = new Vector2 (z.x, z.y);
 	}

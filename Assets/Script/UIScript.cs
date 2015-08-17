@@ -18,12 +18,11 @@ public class UIScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
-
 		// Only run this once.
 		if (initialized)
 			return;
 		Random.seed = 42;
-		selectedSidebarPanel (index);
+		//selectedSidebarPanel (index);
 		quitMenu = GameObject.Find ("QuitMenu").GetComponent<Canvas> ();
 		mainMenuText = GameObject.Find ("Main Menu").GetComponent<Button> ();
 
@@ -71,7 +70,7 @@ public class UIScript : MonoBehaviour {
 			else if(this.gameObject.name.Equals("LoadImages"))
 			{
 				print ("LoadImages button - Key tap");
-				loadImagesPress();
+				//loadImagesPress();
 			}
 		}
 	}
