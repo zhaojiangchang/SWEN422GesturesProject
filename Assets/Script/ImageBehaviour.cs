@@ -71,10 +71,13 @@ public class ImageBehaviour : MonoBehaviour {
 		Hand hand = frame.Hands[0];
 		Hand otherHand = frame.Hands[1];
 		Gesture gesture = frame.Gestures () [0];
+
+		print ("x: "+ this.image.position.x + "y: "+this.image.position.y);
+
 		
 		if (!images.Contains (image) && otherHand.GrabStrength > 0.7f && frame.Hands.Count > 1) {
-			print ("Selected: " + this.gameObject.name);
-			print ("Added: " + this.gameObject.name);
+//			print ("Selected: " + this.gameObject.name);
+//			print ("Added: " + this.gameObject.name);
 			images.Add (image);
 			this.gameObject.GetComponent<SpriteRenderer>().color = Color.cyan;
 		}
@@ -132,16 +135,16 @@ public class ImageBehaviour : MonoBehaviour {
 			int depth = (int) Mathf.Floor((z / 120.0f) * 5.0f);
 			this.gameObject.GetComponent<SpriteRenderer> ().sortingOrder = depth;
 		}
-		
-		if (this.image.position.x < -1100.0f && this.image.position.x > -2700.0f 
-		    && this.image.position.y < -700.0f && this.image.position.y > -780.0f) {
+
+
+		if (this.image.position.x < -1600.0f && this.image.position.y < -1000.0f) {
 			
 			Vector3 rot = transform.rotation.eulerAngles;
 			rot = new Vector3(0,0,0);
-			image.position = intialPosition;
 			image.transform.localRotation = Quaternion.Euler (rot);
 			image.transform.localScale = new Vector3(50.0f, 50.0f, 0.0f);
 			this.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+			image.position = intialPosition;
 			images.Remove (image);
 		}
 		
