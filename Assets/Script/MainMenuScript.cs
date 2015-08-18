@@ -14,7 +14,7 @@ public class MainMenuScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
-		quitMenu = GameObject.Find ("QuitMenu").GetComponent<Canvas> ();
+		//quitMenu = GameObject.Find ("QuitMenu").GetComponent<Canvas> ();
 		startText = GameObject.Find("Play").GetComponent<Button> ();
 		exitText = GameObject.Find("Exit").GetComponent<Button> ();
 		controller = new Controller();
@@ -26,17 +26,20 @@ public class MainMenuScript : MonoBehaviour {
 		controller.Config.SetFloat ("Gesture.KeyTap.MinDistance", 4.0f);
 		controller.Config.Save();
 
-		quitMenu.enabled = false;
+		//quitMenu.enabled = false;
 	}
 
 	void OnTriggerStay2D(Collider2D other) 
 	{	
-		print ("colliding");
+		//print ("colliding");
 		Frame frame = controller.Frame ();
 		Hand hand = frame.Hands[0];
-		
+	
 		if (frame.Gestures () [0].Type == Gesture.GestureType.TYPEKEYTAP) 
 		{
+			print (frame.Gestures () [0].Type == Gesture.GestureType.TYPEKEYTAP);
+			print (this.gameObject.name);
+
 			if(this.gameObject.name.Equals("Play"))
 			{
 				print ("Play - Key tap");
@@ -47,31 +50,14 @@ public class MainMenuScript : MonoBehaviour {
 				print ("Exit - Key tap");
 				ExitPress();
 			}
-			if(this.gameObject.name.Equals("Yes"))
-			{
-				print ("Yes - Key tap");
-				ExitGame();
-			}
-			if(this.gameObject.name.Equals("No"))
-			{
-				print ("No - Key tap");
-				NoPress();
-			}
 		}
 	}
 
 	public void ExitPress()
 	{
-		quitMenu.enabled = true;
 		startText.enabled = false;
 		exitText.enabled = false;
-	}
-
-	public void NoPress()
-	{
-		quitMenu.enabled = false;
-		startText.enabled = true;
-		exitText.enabled = true;
+		ExitGame ();
 	}
 
 	public void StartLevel()

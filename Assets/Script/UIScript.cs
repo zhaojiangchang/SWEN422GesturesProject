@@ -42,8 +42,8 @@ public class UIScript : MonoBehaviour {
 		Hand hand = frame.Hands[0];
 		
 		if (frame.Gestures () [0].Type == Gesture.GestureType.TYPEKEYTAP) 
-		{	print (other == null);
-			print (this.gameObject == null);
+		{	
+			print (other == null);
 			if(this.gameObject.name.Equals("Main Menu"))
 			{
 				print ("Main Menu - Key tap");
