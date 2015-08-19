@@ -43,12 +43,12 @@ public class UIScript : MonoBehaviour {
 
 		initialized = true;
 	}
-	//Trigger the gesture when hand stay on the object
+	//Trigger the gesture when hand is hovering over an object
 	void OnTriggerStay2D(Collider2D other) 
 	{
 		Frame frame = controller.Frame ();
 		Hand hand = frame.Hands[0];
-		// Check gameobject's name when hand over the object
+		// Check gameobject's name when hand is over the object
 		if (frame.Gestures () [0].Type == Gesture.GestureType.TYPEKEYTAP) 
 		{	
 			print (other == null);

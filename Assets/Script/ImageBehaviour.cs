@@ -69,7 +69,7 @@ public class ImageBehaviour : MonoBehaviour {
 		timer.Stop ();
 		cursor.GetComponent<Animator> ().enabled = false;
 	}
-	//Trigger the gesture when hand stay on the object
+	//Trigger the gesture when hand is hovering over an object
 	void OnTriggerStay2D(Collider2D other) 
 	{	
 		// Images can collide. Only bother with this if its the cursor.
@@ -136,7 +136,8 @@ public class ImageBehaviour : MonoBehaviour {
 			this.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
 			images.Clear ();
 		}
-		
+
+		// if at least one image is selected
 		if(images.Contains(image) && frame.Hands.Count > 1)
 		{
 			float z = frame.Hands.Leftmost.PalmPosition.z;
@@ -145,7 +146,7 @@ public class ImageBehaviour : MonoBehaviour {
 			this.gameObject.GetComponent<SpriteRenderer> ().sortingOrder = depth;
 		}
 
-
+		// position for deleting an object and putting it back in the menu
 		if (this.image.position.x < -1600.0f && this.image.position.y < -1000.0f) {
 			
 			Vector3 rot = transform.rotation.eulerAngles;
@@ -156,7 +157,8 @@ public class ImageBehaviour : MonoBehaviour {
 			image.position = intialPosition;
 			images.Remove (image);
 		}
-		
+
+		// for moving the object
 		if(images.Contains(image) && hand.PinchStrength > 0.7f)
 			trackLeap (frame);
 	}

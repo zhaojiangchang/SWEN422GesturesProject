@@ -34,7 +34,7 @@ public class MainMenuScript : MonoBehaviour {
 		controller.Config.SetFloat ("Gesture.KeyTap.MinDistance", 4.0f);
 		controller.Config.Save();
 	}
-	//Trigger the gesture when hand stay on the object
+	//Trigger the gesture when hand is hovering over an object
 	void OnTriggerStay2D(Collider2D other) 
 	{	
 		print ("colliding");
@@ -45,7 +45,7 @@ public class MainMenuScript : MonoBehaviour {
 		{
 			print (frame.Gestures () [0].Type == Gesture.GestureType.TYPEKEYTAP);
 			print (this.gameObject.name);
-			// Check gameobject's name when hand over the object
+			// Check gameobject's name when hand is over the object
 			if(this.gameObject.name.Equals("Play"))
 			{
 				print ("Play - Key tap");
